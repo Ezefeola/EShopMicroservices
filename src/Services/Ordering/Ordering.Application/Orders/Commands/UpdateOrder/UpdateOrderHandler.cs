@@ -57,12 +57,7 @@ public class UpdateOrderHandler
             shippingAddress: updatedShippingAddress,
             billingAddress: updatedBillingAddress,
             payment: updatedPayment,
-            status: orderDto.status
+            status: orderDto.Status
         );
-    }
-
-    private Order CreateNewOrder()
-    {
-
     }
 }
