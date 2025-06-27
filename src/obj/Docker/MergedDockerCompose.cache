@@ -1,0 +1,344 @@
+name: dockercompose6134869587821504845
+services:
+  basket.api:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: Services/Basket/Basket.API/Dockerfile
+    depends_on:
+      basketdb:
+        condition: service_started
+        required: true
+      discount.grpc:
+        condition: service_started
+        required: true
+      distributedcache:
+        condition: service_started
+        required: true
+      messagebroker:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__Database: Server=basketdb;Port=5432;Database=BasketDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      ConnectionStrings__Redis: distributedcache:6379
+      GrpcSettings__DiscountUrl: https://discount.grpc:8081
+      MessageBroker__Host: amqp://ecommerce-mq:5672
+      MessageBroker__Password: guest
+      MessageBroker__UserName: guest
+    image: basketapi
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6001"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6061"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  basketdb:
+    container_name: basketdb
+    environment:
+      POSTGRES_DB: BasketDb
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    image: postgres
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5433"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: postgres_basket
+        target: /var/lib/postgresql/data
+        volume: {}
+  catalog.api:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+    depends_on:
+      catalogdb:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__Database: Server=catalogdb;Port=5432;Database=CatalogDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    image: catalogapi
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6000"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6060"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  catalogdb:
+    container_name: catalogdb
+    environment:
+      POSTGRES_DB: CatalogDb
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    image: postgres
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: postgres_catalog
+        target: /var/lib/postgresql/data
+        volume: {}
+  discount.grpc:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: Services/Discount/Discount.Grpc/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__Database: Data Source=discountdb
+    image: discountgrpc
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6002"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6062"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  distributedcache:
+    container_name: distributedcache
+    image: redis
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    restart: always
+  messagebroker:
+    container_name: messagebroker
+    environment:
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: guest
+    hostname: ecommerce-mq
+    image: rabbitmq:management
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5672
+        published: "5672"
+        protocol: tcp
+      - mode: ingress
+        target: 15672
+        published: "15672"
+        protocol: tcp
+    restart: always
+  orderdb:
+    container_name: orderdb
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: SwN12345678
+    image: mcr.microsoft.com/mssql/server
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1433"
+        protocol: tcp
+    restart: always
+  ordering.api:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+    depends_on:
+      messagebroker:
+        condition: service_started
+        required: true
+      orderdb:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ConnectionStrings__Database: Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678;Encrypt=False;TrustServerCertificate=True
+      FeatureManagement__OrderFullfilment: "false"
+      MessageBroker__Host: amqp://ecommerce-mq:5672
+      MessageBroker__Password: guest
+      MessageBroker__UserName: guest
+    image: orderingapi
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6003"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6063"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  shopping.web:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: WebApps/Shopping.Web/Dockerfile
+    depends_on:
+      yarpapigateway:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+      ApiSettings__GatewayAddress: http://yarpapigateway:8080
+    image: shoppingweb
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6005"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6065"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  yarpapigateway:
+    build:
+      context: C:\Users\ezefe\OneDrive\Escritorio\General\Projects\EShopMicroservices\src
+      dockerfile: ApiGateways/YarpApiGateway/Dockerfile
+    depends_on:
+      basket.api:
+        condition: service_started
+        required: true
+      catalog.api:
+        condition: service_started
+        required: true
+      ordering.api:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: yarpapigateway
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "6004"
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        published: "6064"
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ezefe\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+networks:
+  default:
+    name: dockercompose6134869587821504845_default
+volumes:
+  postgres_basket:
+    name: dockercompose6134869587821504845_postgres_basket
+  postgres_catalog:
+    name: dockercompose6134869587821504845_postgres_catalog

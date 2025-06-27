@@ -2,15 +2,21 @@
 
 namespace Ordering.API.Endpoints;
 
-//public record class DeleteOrderRequest(Guid Id);
+//- Accepts the order ID as a parameter.
+//- Constructs a DeleteOrderCommand.
+//- Sends the command using MediatR.
+//- Returns a success or not found response.
+
+//public record DeleteOrderRequest(Guid Id);
 public record DeleteOrderResponse(bool IsSuccess);
+
 public class DeleteOrder : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/orders/{id}", async (Guid id, ISender sender) =>
+        app.MapDelete("/orders/{id}", async (Guid Id, ISender sender) =>
         {
-            var result = await sender.Send(new DeleteOrderCommand(id));
+            var result = await sender.Send(new DeleteOrderCommand(Id));
 
             var response = result.Adapt<DeleteOrderResponse>();
 

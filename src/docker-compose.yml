@@ -1,8 +1,10 @@
+version: '3.4'
+
 services:
-  catalogdb: 
+  catalogdb:
     image: postgres
 
-  basketdb: 
+  basketdb:
     image: postgres
 
   distributedcache:
@@ -32,8 +34,30 @@ services:
       context: .
       dockerfile: Services/Discount/Discount.Grpc/Dockerfile
 
-volumes: 
+  ordering.api:
+    image: ${DOCKER_REGISTRY-}orderingapi
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+
+  yarpapigateway:
+    image: ${DOCKER_REGISTRY-}yarpapigateway
+    build:
+      context: .
+      dockerfile: ApiGateways/YarpApiGateway/Dockerfile
+
+  shopping.web:
+    image: ${DOCKER_REGISTRY-}shoppingweb
+    build:
+      context: .
+      dockerfile: WebApps/Shopping.Web/Dockerfile
+
+volumes:
   postgres_catalog:
   postgres_basket:
+
+
+
+
 
 

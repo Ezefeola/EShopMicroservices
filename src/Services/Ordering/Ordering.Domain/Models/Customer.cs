@@ -15,6 +15,7 @@ public class Customer : Entity<CustomerId>
             Name = name,
             Email = email
         };
+
         return customer;
     }
 }

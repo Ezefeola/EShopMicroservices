@@ -2,8 +2,13 @@
 
 namespace Ordering.API.Endpoints;
 
+//- Accepts a customer ID.
+//- Uses a GetOrdersByCustomerQuery to fetch orders.
+//- Returns the list of orders for that customer.
+
 //public record GetOrdersByCustomerRequest(Guid CustomerId);
 public record GetOrdersByCustomerResponse(IEnumerable<OrderDto> Orders);
+
 public class GetOrdersByCustomer : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

@@ -5,26 +5,20 @@ using Ordering.Infrastructure.Data.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#region Services
-
+// Add services to the container.
 builder.Services
     .AddApplicationServices(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration)
     .AddApiServices(builder.Configuration);
 
-#endregion Services
-
 var app = builder.Build();
 
-#region Middlewares
-
+// Configure the HTTP request pipeline.
 app.UseApiServices();
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    await app.InitializeDatabaseAsync();
+    await app.InitialiseDatabaseAsync();
 }
-
-#endregion Middlewares
 
 app.Run();

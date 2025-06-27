@@ -1,4 +1,5 @@
 ﻿namespace Basket.API.Dtos;
+
 public class BasketCheckoutDto
 {
     public string UserName { get; set; } = default!;
@@ -16,7 +17,7 @@ public class BasketCheckoutDto
 
     // Payment
     public string CardName { get; set; } = default!;
-    public string CarNumber { get; set; } = default!;
+    public string CardNumber { get; set; } = default!;
     public string Expiration { get; set; } = default!;
     public string CVV { get; set; } = default!;
     public int PaymentMethod { get; set; } = default!;

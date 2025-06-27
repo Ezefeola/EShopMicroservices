@@ -3,8 +3,13 @@ using Ordering.Application.Orders.Queries.GetOrders;
 
 namespace Ordering.API.Endpoints;
 
+//- Accepts pagination parameters.
+//- Constructs a GetOrdersQuery with these parameters.
+//- Retrieves the data and returns it in a paginated format.
+
 //public record GetOrdersRequest(PaginationRequest PaginationRequest);
 public record GetOrdersResponse(PaginatedResult<OrderDto> Orders);
+
 public class GetOrders : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -16,7 +21,6 @@ public class GetOrders : ICarterModule
             var response = result.Adapt<GetOrdersResponse>();
 
             return Results.Ok(response);
-
         })
         .WithName("GetOrders")
         .Produces<GetOrdersResponse>(StatusCodes.Status200OK)
